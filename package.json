@@ -5,8 +5,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/infra/http/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx watch --env-file .env src/infra/http/server.ts",
+    "test": "dotenv -e .env.test -- vitest run",
+    "test:watch": "dotenv -e .env.test -- vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:migrate:test": "dotenv -e .env.test -- drizzle-kit migrate",
+    "pretest": "pnpm run db:migrate:test",
+    "pretest:watch": "pnpm run db:migrate:test"
   },
   "keywords": [],
   "author": "",
@@ -14,14 +21,29 @@
   "packageManager": "pnpm@10.32.0",
   "devDependencies": {
     "@biomejs/biome": "^2.4.6",
+    "@faker-js/faker": "^10.4.0",
     "@types/node": "^25.4.0",
+    "dotenv-cli": "^11.0.0",
+    "drizzle-kit": "^0.31.9",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.0"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1015.0",
+    "@aws-sdk/lib-storage": "^3.1015.0",
     "@fastify/cors": "^11.2.0",
+    "@fastify/multipart": "^9.4.0",
+    "@fastify/swagger": "^9.7.0",
+    "@fastify/swagger-ui": "^5.2.5",
+    "csv-stringify": "^6.7.0",
+    "dayjs": "^1.11.20",
+    "drizzle-orm": "^0.45.1",
     "fastify": "^5.8.2",
     "fastify-type-provider-zod": "^6.1.0",
+    "postgres": "^3.4.8",
+    "uuidv7": "^1.1.0",
     "zod": "^4.3.6"
   }
 }
