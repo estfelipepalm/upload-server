@@ -6,6 +6,6 @@ export const r2 = new S3Client({
   endpoint: `https://${env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
   credentials: {
     accessKeyId: env.CLOUDFLARE_ACCESS_KEY_ID,
-    secretAccessKey: env.CLOUDFLRE_SECRET_ACCESS_KEY,
+    secretAccessKey: env.CLOUDFLARE_SECRET_ACCESS_KEY,
   },
 })
