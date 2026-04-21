@@ -1,12 +1,12 @@
+import { PassThrough, Transform } from 'node:stream'
+import { pipeline } from 'node:stream/promises'
+import { stringify } from 'csv-stringify'
+import { ilike } from 'drizzle-orm'
+import { z } from 'zod'
 import { db, pg } from '@/infra/db'
 import { schema } from '@/infra/db/schemas/'
-import { z } from 'zod'
-import { type Either, makeRight } from '@/shared/either'
-import { ilike } from 'drizzle-orm'
-import { stringify } from 'csv-stringify'
-import { pipeline } from 'node:stream/promises'
-import { PassThrough, Transform } from 'node:stream'
 import { uploadFileToStorage } from '@/infra/storage/upload-file-to-storage'
+import { type Either, makeRight } from '@/shared/either'
 
 const exportUploadsInput = z.object({
   searchQuery: z.string().optional(),
@@ -45,7 +45,7 @@ export async function exportUploads(
       { key: 'id', header: 'ID' },
       { key: 'name', header: 'Name' },
       { key: 'remote_url', header: 'URL' },
-      { key: 'created_at', header: 'Uploaded at' },
+      { key: 'created_at', header: 'Uploaded At' },
     ],
   })
 
