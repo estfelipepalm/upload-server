@@ -1,0 +1,60 @@
+# Nome que aparecerá na aba "Actions" do seu repositório no GitHub
+name: E2E Tests
+
+# Define os gatilhos: o que faz esse arquivo ser executado?
+on:  
+  pull_request: # Sempre que houver uma interação em um Pull Request (PR)
+    branches:
+      - main # Apenas se o PR tiver como destino a branch 'main'
+    # Tipos específicos de eventos no PR que disparam o teste
+    # 'synchronize' significa que o teste roda de novo se você der um novo 'git push' no PR
+    types: [opened, reopened, labeled, unlabeled, synchronize]
+
+# Onde o trabalho real acontece
+jobs:  
+  run-ci: # ID do trabalho
+    name: Run E2E Tests # Nome legível que aparece no log
+    runs-on: ubuntu-latest # O sistema operacional da máquina virtual (Linux)
+
+    # Configuração de infraestrutura temporária (Docker)
+    services:
+      postgres: # Sobe um container de banco de dados PostgreSQL
+        image: postgres:13 # Versão 13 do Postgres
+        ports:
+          - 5432:5432 # Mapeia a porta do container para a porta da máquina virtual
+        env: # Variáveis de ambiente para criar o banco inicial
+          POSTGRES_USER: docker
+          POSTGRES_PASSWORD: docker
+          POSTGRES_DB: upload_test
+        # Verifica se o banco está pronto para receber conexões antes de iniciar os testes
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    # Sequência de comandos que a máquina virtual vai executar
+    steps:
+      # 1. Copia o código do seu repositório para dentro da máquina virtual
+      - uses: actions/checkout@v4
+
+      # 2. Prepara o PNPM (seu gerenciador de pacotes)
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          #version: 9  Garante que usará a versão 9
+          run_install: false # Não instala as dependências ainda (faremos depois)
+
+      # 3. Prepara o ambiente Node.js
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # Versão Long Term Support (LTS)
+          cache: "pnpm" # Faz cache das dependências para o próximo rodar mais rápido
+
+      # 4. Instala as dependências do seu projeto
+      # '--frozen-lockfile' garante que ele não mude as versões das libs, usando exatamente o que está no seu lock
+      - run: pnpm install --frozen-lockfile
+
+      # 5. O momento da verdade: executa o comando de teste que definimos no package.json
+      - run: pnpm run test
